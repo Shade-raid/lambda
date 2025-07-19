@@ -1,97 +1,96 @@
-# Lambda//Void
+# Lambda//Void 🔮💻
 
-🧮💻 *An idle cyberpunk game about abstract math, functional programming, and bending the fabric of reality itself.*
+*A stylish idle game where math meets cyberpunk.*
 
----
-
-### ❓ What is this?
-
-**Lambda//Void** is a browser-based idle/incremental game where you generate and reduce mysterious expressions called **lambda functions** — the foundation of all functional programming languages. It’s part educational, part meditative, part digital rebellion.
-
-You're inside a glowing cyberpunk system where pure computation manifests as expressions. Every reduction brings you closer to rewriting reality. It starts small — generate functions, simplify them, earn currency — but grows deeper with **automation, quantum upgrades, and prestige mechanics**.
+> ⚠️ **Prototype Warning:**  
+> This game is in **active development**. What you’re playing now is a feature-rich prototype. Expect polish, balance tweaks, and new mechanics soon!
 
 ---
 
-### 🚀 Try It Out
+## 🧠 What’s This?
 
-Just open the game in any modern browser. No installs. No accounts.
+**Lambda//Void** is an incremental/idle web game about building abstract lambda calculus expressions and collapsing them to gain power.
 
-Designed for a **960×600 window** to fit Newgrounds perfectly.
-
----
-
-### 🕹️ Gameplay Summary
-
-- 💾 Generate lambda expressions using tokens  
-- 🔧 Reduce them step-by-step to gain compute cycles  
-- 📈 Spend cycles on upgrades for faster automation and more complex functions  
-- 🌀 Compile Reality (prestige) to earn **Reality Points**  
-- ⚛️ Convert Reality Points into **Qubits** to unlock **Quantum Lambda Functions**  
-- 🔁 Automate everything. Sit back. Watch the void work.
+Set inside a neon-drenched, digital void, you play as an operator trying to reconstruct reality through pure computation. It’s mathematical, mysterious — and surprisingly relaxing.
 
 ---
 
-### 💡 Why Lambda Calculus?
+## 🕹️ Gameplay Overview
 
-Because it’s beautiful and weird.
-
-Lambda calculus is the simplest, most powerful system of rules ever invented to define computation. It’s the blueprint for functional programming. In **Lambda//Void**, you don’t need to know the math — but you’ll *feel* the logic.
-
----
-
-### 🌌 Core Features
-
-- 🧠 Lambda expression engine (abstraction + reduction)  
-- 🔄 Upgradeable systems (reduction speed, complexity, passive gen)  
-- 💾 Prestige mechanic (Compile Reality)  
-- ⚛️ Quantum functions and Qubits  
-- 👁️ Cyberpunk UI, glitch log messages, synth vibes  
-- 📚 Step-by-step tutorial for beginners  
-- 🧘‍♂️ Learn by playing — no math required
+- **Tokens** let you generate lambda expressions  
+- **Reduction steps** yield **Compute Cycles**, used for upgrades  
+- Use **Compute Cycles** to:
+  - Improve reduction speed  
+  - Increase complexity of expressions  
+  - Unlock passive token generation  
+- **Reality Points** are gained by prestiging (Compiling Reality)  
+- Convert **Reality Points into Qubits** to unlock **Quantum Lambda Functions**  
+- Go deeper. Automate everything. Reach for the void.
 
 ---
 
-### 🛠️ Tech Stuff
+## 🛠️ Current Features
 
-- Pure HTML + CSS + JavaScript  
-- No frameworks, no nonsense  
-- Fixed 960x600 resolution  
-- All logic in one game loop (`gameTick`), runs 60fps  
-- Expandable upgrade system
-
----
-
-### ✨ Coming Soon
-
-- 🧬 Expression tree visualizer  
-- 🎵 Soundtrack + SFX  
-- 🏆 Achievements + lore snippets  
-- 💾 Save/load game  
-- 📊 Stats and leaderboards  
+✅ Generate and reduce expressions  
+✅ Cyberpunk-styled UI (960×600 resolution for Newgrounds)  
+✅ Automation toggles  
+✅ Quantum upgrades + Qubit economy  
+✅ Logging system  
+✅ In-game tutorial  
+✅ Full idle loop working
 
 ---
 
-### 📜 License
+## 🚧 Upcoming Features
 
-MIT — go wild.
-
----
-
-### 🙏 Credits
-
-Inspired by:
-- Lambda calculus
-- Cyberpunk fiction (Neuromancer, Ghost in the Shell)
-- Incremental games like Universal Paperclips and Antimatter Dimensions
+- 💾 Save/load system  
+- 🎵 Music + glitchy ambient SFX  
+- 🌲 Expression visualizer  
+- 🏆 Achievements + hidden lore nodes  
+- ⛩️ Interface polish and particle effects  
+- 📊 Advanced upgrade layers
 
 ---
 
-### 👋 Final Words
+## 🔧 Tech Stack
 
-If you ever thought math was boring… this game might change your mind.
+- HTML  
+- CSS  
+- Vanilla JavaScript (no external libraries)
 
-Pull the void apart.  
-Compile your own reality.  
-Welcome to **Lambda//Void**.
+---
 
+## 🎓 Why Lambda Calculus?
 
+Because it’s the secret skeleton of all functional programming — and it’s surprisingly fun to reduce.
+
+The game simplifies it to an interactive experience, so even beginners can intuitively "play" with functional expressions.
+
+---
+
+## 👨‍💻 Contributing
+
+This project is just getting started. Want to help with code, math logic, UI/UX, or music? Open a PR or message the dev!
+
+---
+
+## 📜 License
+
+MIT. Use it, remix it, extend it, just give credit.
+
+---
+
+## 🧪 Reminder
+
+This is **just the prototype** — core mechanics are here, but it will keep expanding and improving!
+
+---
+
+## 🧠 Play it, Break it, Tell Us
+
+Have a feature request? Found a bug?  
+Want weirder math or more lasers?  
+Submit feedback or ideas anytime.
+
+Enjoy the void.  
+—
