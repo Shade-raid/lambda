@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lambda//Void Expanded</title>
+  <style>
+    /* Styles simplified, same cyberpunk vibe, fixed 960x600 */
+    body {
+      margin: 0;
+      background: #101020;
+      color: #00ffcc;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      user-select: none;
+    }
+    #gameWindow {
+      width: 960px;
+      height: 600px;
+      background: #0a0a18;
+      border: 4px solid #00ffcc;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+    }
+    h1 {
+      margin: 0 0 10px;
+      color: #00ffc8;
+      text-align: center;
+      letter-spacing: 3px;
+      text-shadow: 0 0 5px #00ffcc;
+    }
+    #resources {
+      display: flex;
+      justify-content: space-around;
+      font-weight: bold;
+    }
+    button {
+      background: #004040;
+      border: none;
+      color: #00ffcc;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 16px;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #007777;
+    }
+    #expressionDisplay {
+      background: #001010;
+      border: 2px solid #00ffcc;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 18px;
+      white-space: pre-wrap;
+      min-height: 40px;
+      user-select: text;
+    }
+    #log {
+      background: #001010;
+      border: 2px solid #00ffcc;
+      height: 120px;
+      overflow-y: auto;
+      padding: 8px;
+      font-size: 13px;
+      line-height: 1.3;
+    }
+    #upgrades {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .upgrade {
+      flex: 1 1 180px;
+      background: #002020;
+      padding: 8px;
+      border-radius: 5px;
+      text-align: center;
+      border: 1px solid #00ffcc;
+      user-select: none;
+    }
+    label {
+      user-select: none;
+    }
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    #tutorialModal {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #001010dd;
+      border: 2px solid #00ffcc;
+      padding: 20px;
+      max-width: 500px;
+      font-size: 16px;
+      display: none;
+      color: #00ffcc;
+      user-select: none;
+      border-radius: 8px;
+      z-index: 9999;
+    }
+    #tutorialModal.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="gameWindow">
+    <h1>Lambda//Void</h1>
+    <div id="resources">
+      <div>Tokens: <span id="tokens">0</span></div>
+      <div>Compute Cycles: <span id="computeCycles">0</span></div>
+      <div>Reality Points: <span id="realityPoints">0</span></div>
+      <div>Qubits: <span id="qubits">0</span></div>
+    </div>
+
+    <div id="expressionDisplay">[No expression generated yet]</div>
+
+    <div id="upgrades">
+      <div class="upgrade">
+        <button id="generateFuncBtn">Generate Lambda Function (Cost: 10 Tokens)</button>
+      </div>
+      <div class="upgrade">
+        <button id="reduceBtn">Reduce Expression</button>
+      </div>
+      <div class="upgrade">
+        <button id="upgradeReductionBtn">Upgrade Reduction (Cost: 15 Cycles)</button>
+        <div>Level: <span id="reductionLevel">0</span></div>
+      </div>
+      <div class="upgrade">
+        <button id="upgradeComplexityBtn">Upgrade Complexity (Cost: 20 Cycles)</button>
+        <div>Level: <span id="complexityLevel">0</span></div>
+      </div>
+      <div class="upgrade">
+        <button id="upgradeSynthesizerBtn">Lambda Synthesizer (Cost: 50 Cycles)</button>
+        <div>Level: <span id="synthesizerLevel">0</span></div>
+      </div>
+      <div class="upgrade">
+        <button id="convertRealityToQubitBtn">Convert 5 Reality Points → 1 Qubit</button>
+        <div>Qubits boost token gen by <span id="qubitBoostPercent">0</span>%</div>
+      </div>
+      <div class="upgrade">
+        <button id="unlockQuantumFuncBtn" disabled>Unlock Quantum Lambda Functions (Cost: 3 Qubits)</button>
+        <div>Status: <span id="quantumStatus">Locked</span></div>
+      </div>
+      <div class="upgrade toggle-group">
+        <label><input type="checkbox" id="autoGenerateToggle" /> Auto Generate</label>
+        <label><input type="checkbox" id="autoReduceToggle" /> Auto Reduce</label>
+        <label><input type="checkbox" id="autoUpgradeToggle" /> Auto Upgrade</label>
+      </div>
+    </div>
+
+    <button id="prestigeBtn">Compile Reality (Cost: 50 Tokens)</button>
+    <button id="resetBtn">Reset Progress</button>
+
+    <div id="log"></div>
+  </div>
+
+  <div id="tutorialModal">
+    <div id="tutorialText"></div>
+    <button id="tutorialNextBtn">Next</button>
+  </div>
+
+<script>
+(() => {
+  // --- Game State ---
+  const state = {
+    tokens: 0,
+    computeCycles: 0,
+    realityPoints: 0,
+    qubits: 0,
+
+    expression: '',
+    exprMaxLength: 5,
+    reductionLevel: 0,
+    complexityLevel: 0,
+    synthesizerLevel: 0,
+
+    quantumFunctionsUnlocked: false,
+    tokensPerSecondBase: 1,
+
+    autoGenerate: false,
+    autoReduce: false,
+    autoUpgrade: false,
+
+    tutorialStep: 0,
+    achievementsUnlocked: new Set(),
+  };
+
+  // --- Cached DOM ---
+  const tokensSpan = document.getElementById('tokens');
+  const computeCyclesSpan = document.getElementById('computeCycles');
+  const realityPointsSpan = document.getElementById('realityPoints');
+  const qubitsSpan = document.getElementById('qubits');
+
+  const expressionDisplay = document.getElementById('expressionDisplay');
+  const logDiv = document.getElementById('log');
+
+  const generateFuncBtn = document.getElementById('generateFuncBtn');
+  const reduceBtn = document.getElementById('reduceBtn');
+  const upgradeReductionBtn = document.getElementById('upgradeReductionBtn');
+  const upgradeComplexityBtn = document.getElementById('upgradeComplexityBtn');
+  const upgradeSynthesizerBtn = document.getElementById('upgradeSynthesizerBtn');
+  const convertRealityToQubitBtn = document.getElementById('convertRealityToQubitBtn');
+  const unlockQuantumFuncBtn = document.getElementById('unlockQuantumFuncBtn');
+
+  const reductionLevelSpan = document.getElementById('reductionLevel');
+  const complexityLevelSpan = document.getElementById('complexityLevel');
+  const synthesizerLevelSpan = document.getElementById('synthesizerLevel');
+  const qubitBoostPercentSpan = document.getElementById('qubitBoostPercent');
+  const quantumStatusSpan = document.getElementById('quantumStatus');
+
+  const autoGenerateToggle = document.getElementById('autoGenerateToggle');
+  const autoReduceToggle = document.getElementById('autoReduceToggle');
+  const autoUpgradeToggle = document.getElementById('autoUpgradeToggle');
+
+  const prestigeBtn = document.getElementById('prestigeBtn');
+  const resetBtn = document.getElementById('resetBtn');
+
+  // --- Utilities ---
+  function log(message) {
+    const p = document.createElement('p');
+    p.textContent = message;
+    logDiv.appendChild(p);
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  // --- Lambda expression generation ---
+  const vars = ['x', 'y', 'z', 'w'];
+  function generateRandomLambda(length) {
+    // 50% chance quantum expression if unlocked
+    const quantumChance = state.quantumFunctionsUnlocked ? 0.25 : 0;
+
+    if (Math.random() < quantumChance) {
+      // Quantum expression
+      return 'Q(' + generateRandomLambda(length - 2) + ')';
+    }
+
+    if (length <= 1) {
+      return vars[Math.floor(Math.random() * vars.length)];
+    }
+    const choice = Math.random();
+
+    if (choice < 0.33) {
+      // Abstraction
+      const v = vars[Math.floor(Math.random() * vars.length)];
+      return `λ${v}.${generateRandomLambda(length - 1)}`;
+    } else if (choice < 0.66) {
+      // Application
+      const left = generateRandomLambda(Math.floor(length / 2));
+      const right = generateRandomLambda(length - Math.floor(length / 2));
+      return `(${left} ${right})`;
+    } else {
+      // Variable
+      return vars[Math.floor(Math.random() * vars.length)];
+    }
+  }
+
+  // --- Reduction (beta-reduction step simulation) ---
+  function reduceExpression(expr) {
+    // Simplified: remove outermost abstraction if exists for simulation
+    if (expr.startsWith('λ')) {
+      // Remove first abstraction λx. and return body
+      const dotIndex = expr.indexOf('.');
+      if (dotIndex > 0) {
+        return expr.slice(dotIndex + 1);
+      }
+    }
+    // If quantum expression, remove Q() wrapper for simulation
+    if (expr.startsWith('Q(') && expr.endsWith(')')) {
+      return expr.slice(2, -1);
+    }
+    // Otherwise shorten the expression by removing one char at random to simulate reduction
+    if (expr.length > 1) {
+      return expr.slice(0, expr.length - 1);
+    }
+    return expr;
+  }
+
+  // --- Calculate tokens per second ---
+  function getTokensPerSecond() {
+    let base = state.tokensPerSecondBase + state.realityPoints * 2;
+    base += state.synthesizerLevel * 3;
+    base += state.qubits * 5;
+    return base;
+  }
+
+  // --- Generate function ---
+  function generateFunction() {
+    if (state.tokens < 10) {
+      log('Not enough tokens to generate function.');
+      return;
+    }
+    state.tokens -= 10;
+    const expr = generateRandomLambda(state.exprMaxLength);
+    state.expression = expr;
+    log(`Generated lambda function: ${expr}`);
+    updateUI();
+    if (state.tutorialStep === 0) {
+      state.tutorialStep = 1;
+      showTutorialStep();
+    }
+  }
+
+  // --- Reduce current expression ---
+  function reduceCurrentExpression() {
+    if (!state.expression) {
+      log('No expression to reduce.');
+      return;
+    }
+    const oldExpr = state.expression;
+    const newExpr = reduceExpression(oldExpr);
+
+    if (newExpr === oldExpr) {
+      log('Expression fully reduced.');
+      return;
+    }
+    state.expression = newExpr;
+
+    // Reward compute cycles based on reduction amount & complexity level
+    const baseReward = 1 + state.complexityLevel * 2;
+    const reward = baseReward + state.reductionLevel;
+    state.computeCycles += reward;
+    log(`Reduced expression: ${newExpr} (+${reward} compute cycles)`);
+    updateUI();
+
+    if (state.tutorialStep === 2) {
+      state.tutorialStep = 3;
+      showTutorialStep();
+    }
+  }
+
+  // --- Buy upgrades ---
+  function buyUpgrade(type) {
+    let cost, levelSpan, levelName;
+    switch(type) {
+      case 'reduction':
+        cost = 15 + state.reductionLevel * 10;
+        levelSpan = reductionLevelSpan;
+        levelName = 'Reduction';
+        if (state.computeCycles < cost) {
+          log(`Not enough Compute Cycles to upgrade ${levelName}.`);
+          return;
+        }
+        state.computeCycles -= cost;
+        state.reductionLevel++;
+        log(`Upgraded ${levelName} to level ${state.reductionLevel}.`);
+        break;
+
+      case 'complexity':
+        cost = 20 + state.complexityLevel * 15;
+        levelSpan = complexityLevelSpan;
+        levelName = 'Complexity';
+        if (state.computeCycles < cost) {
+          log(`Not enough Compute Cycles to upgrade ${levelName}.`);
+          return;
+        }
+        state.computeCycles -= cost;
+        state.complexityLevel++;
+        state.exprMaxLength = 5 + state.complexityLevel;
+        log(`Upgraded ${levelName} to level ${state.complexityLevel}. Max expression length: ${state.exprMaxLength}`);
+        break;
+
+      case 'synthesizer':
+        cost = 50 + state.synthesizerLevel * 50;
+        levelSpan = synthesizerLevelSpan;
+        levelName = 'Lambda Synthesizer';
+        if (state.computeCycles < cost) {
+          log(`Not enough Compute Cycles to upgrade ${levelName}.`);
+          return;
+        }
+        state.computeCycles -= cost;
+        state.synthesizerLevel++;
+        log(`Upgraded ${levelName} to level ${state.synthesizerLevel}. Passive token generation increased.`);
+        break;
+    }
+    updateUI();
+  }
+
+  // --- Convert Reality Points to Qubits ---
+  function convertRealityToQubit() {
+    if (state.realityPoints < 5) {
+      log('Not enough Reality Points to convert.');
+      return;
+    }
+    state.realityPoints -= 5;
+    state.qubits++;
+    log('Converted 5 Reality Points into 1 Qubit.');
+    updateUI();
+  }
+
+  // --- Unlock Quantum Functions ---
+  function unlockQuantumFunctions() {
+    if (state.qubits < 3) {
+      log('Not enough Qubits to unlock Quantum Lambda Functions.');
+      return;
+    }
+    if (state.quantumFunctionsUnlocked) {
+      log('Quantum Lambda Functions already unlocked.');
+      return;
+    }
+    state.qubits -= 3;
+    state.quantumFunctionsUnlocked = true;
+    log('Quantum Lambda Functions unlocked! New powerful expressions available.');
+    updateUI();
+  }
+
+  // --- Prestige ---
+  function compileReality() {
+    if (state.tokens < 50) {
+      log('Not enough Tokens to Compile Reality.');
+      return;
+    }
+    const gainedReality = Math.floor(state.tokens / 50);
+    state.realityPoints += gainedReality;
+    log(`Compiled Reality! Gained ${gainedReality} Reality Points.`);
+    resetProgress(false);
+  }
+
+  // --- Reset ---
+  function resetProgress(fullReset=true) {
+    if (fullReset) {
+      state.tokens = 0;
+      state.computeCycles = 0;
+      state.realityPoints = 0;
+      state.qubits = 0;
+      state.reductionLevel = 0;
+      state.complexityLevel = 0;
+      state.synthesizerLevel = 0;
+      state.exprMaxLength = 5;
+      state.quantumFunctionsUnlocked = false;
+      log('Game fully reset.');
+    } else {
+      // Preserve Reality Points and Qubits, reset other resources
+      state.tokens = 0;
+      state.computeCycles = 0;
+      state.expression = '';
+      state.reductionLevel = 0;
+      state.complexityLevel = 0;
+      state.synthesizerLevel = 0;
+      state.exprMaxLength = 5;
+      state.quantumFunctionsUnlocked = false;
+      log('Progress reset for Reality compilation.');
+    }
+    updateUI();
+  }
+
+  // --- Passive generation & automation loop ---
+  function gameTick(delta) {
+    // delta in seconds
+    // Passive token generation by synthesizer
+    const tokenGain = getTokensPerSecond() * delta;
+    state.tokens += tokenGain;
+
+    if (state.autoGenerate) {
+      if (state.tokens >= 10) generateFunction();
+    }
+    if (state.autoReduce) {
+      reduceCurrentExpression();
+    }
+    if (state.autoUpgrade) {
+      // Try upgrades in priority order: synthesizer, complexity, reduction
+      if (state.computeCycles >= 50) buyUpgrade('synthesizer');
+      else if (state.computeCycles >= 20) buyUpgrade('complexity');
+      else if (state.computeCycles >= 15) buyUpgrade('reduction');
+    }
+
+    updateUI();
+  }
+
+  // --- Update UI ---
+  function updateUI() {
+    tokensSpan.textContent = Math.floor(state.tokens);
+    computeCyclesSpan.textContent = Math.floor(state.computeCycles);
+    realityPointsSpan.textContent = state.realityPoints;
+    qubitsSpan.textContent = state.qubits;
+
+    expressionDisplay.textContent = state.expression || '[No expression generated yet]';
+
+    reductionLevelSpan.textContent = state.reductionLevel;
+    complexityLevelSpan.textContent = state.complexityLevel;
+    synthesizerLevelSpan.textContent = state.synthesizerLevel;
+    qubitBoostPercentSpan.textContent = (state.qubits * 25).toFixed(0);
+
+    quantumStatusSpan.textContent = state.quantumFunctionsUnlocked ? 'Unlocked' : 'Locked';
+
+    unlockQuantumFuncBtn.disabled = state.qubits < 3 || state.quantumFunctionsUnlocked;
+  }
+
+  // --- Tutorial Modal ---
+  const tutorialModal = document.getElementById('tutorialModal');
+  const tutorialText = document.getElementById('tutorialText');
+  const tutorialNextBtn = document.getElementById('tutorialNextBtn');
+  const tutorialSteps = [
+    'Welcome to Lambda//Void! Start by generating your first lambda function (cost: 10 tokens).',
+    'Great! Now reduce the expression step-by-step to earn compute cycles.',
+    'Keep reducing expressions and upgrading your reduction and complexity levels.',
+    'Try upgrading the Lambda Synthesizer to boost passive token generation!',
+    'When ready, compile Reality to prestige and unlock powerful bonuses.',
+    'Have fun mastering the cyberpunk world of lambda calculus!'
+  ];
+
+  function showTutorialStep() {
+    if (state.tutorialStep >= tutorialSteps.length) {
+      tutorialModal.classList.remove('show');
+      return;
+    }
+    tutorialText.textContent = tutorialSteps[state.tutorialStep];
+    tutorialModal.classList.add('show');
+  }
+  tutorialNextBtn.onclick = () => {
+    state.tutorialStep++;
+    showTutorialStep();
+  };
+
+  // --- Event Listeners ---
+  generateFuncBtn.onclick = () => generateFunction();
+  reduceBtn.onclick = () => reduceCurrentExpression();
+  upgradeReductionBtn.onclick = () => buyUpgrade('reduction');
+  upgradeComplexityBtn.onclick = () => buyUpgrade('complexity');
+  upgradeSynthesizerBtn.onclick = () => buyUpgrade('synthesizer');
+  convertRealityToQubitBtn.onclick = () => convertRealityToQubit();
+  unlockQuantumFuncBtn.onclick = () => unlockQuantumFunctions();
+  prestigeBtn.onclick = () => compileReality();
+  resetBtn.onclick = () => resetProgress(true);
+
+  autoGenerateToggle.onchange = (e) => state.autoGenerate = e.target.checked;
+  autoReduceToggle.onchange = (e) => state.autoReduce = e.target.checked;
+  autoUpgradeToggle.onchange = (e) => state.autoUpgrade = e.target.checked;
+
+  // --- Game Loop ---
+  let lastTimestamp = performance.now();
+  function loop(ts) {
+    const delta = (ts - lastTimestamp) / 1000;
+    lastTimestamp = ts;
+    gameTick(delta);
+    requestAnimationFrame(loop);
+  }
+
+  // --- Initialization ---
+  updateUI();
+  showTutorialStep();
+  requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
