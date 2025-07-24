@@ -8,619 +8,291 @@
   body {
     margin: 0;
     font-family: 'Courier New', Courier, monospace;
-    background: #12131a;
+    background: #0f0f1a;
     color: #00ffe7;
-    display: flex;
-    height: 100vh;
     overflow: hidden;
-    user-select: none;
-  }
-  #sidebar {
-    width: 300px;
-    background: #0f1015;
-    border-right: 2px solid #00ffe7;
     display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
   }
-  #main {
-    flex-grow: 1;
-    padding: 20px;
-    box-sizing: border-box;
+
+  #gameContainer {
+    max-width: 1920px;
+    max-height: 1200px;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(45deg, #0a0b11, #1c1d26);
+    box-sizing: border-box;
+    padding: 10px;
   }
+
+  .main-menu, .game-ui {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
+  }
+
+  .main-menu.show, .game-ui.show {
+    display: flex;
+    animation: fadeIn 1s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
   h1 {
-    margin: 0 0 20px 0;
-    font-size: 2.5em;
-    text-shadow: 0 0 10px #00ffe7;
+    font-size: 3em;
+    text-shadow: 0 0 10px #0ff, 0 0 30px #0ff;
   }
+
   button {
-    background: #12131a;
+    background: black;
     border: 2px solid #00ffe7;
     color: #00ffe7;
-    font-size: 1.1em;
-    padding: 10px 15px;
-    margin: 8px 0;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 1.2em;
     cursor: pointer;
-    transition: background 0.3s, color 0.3s;
-    width: 100%;
-    box-sizing: border-box;
+    transition: background 0.3s;
   }
-  button:hover:not(:disabled) {
-    background: #00ffe7;
-    color: #12131a;
+
+  button:hover {
+    background: #00ffe733;
   }
-  button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-  #tokensDisplay, #upgradesDisplay, #achievementsPanel {
-    margin-bottom: 15px;
-    font-size: 1.1em;
-  }
+
   #logArea {
+    width: 80%;
+    height: 200px;
+    margin-top: 20px;
     background: #111122;
-    border: 1px solid #00ffe7;
-    padding: 10px;
-    height: 150px;
-    overflow-y: auto;
-    font-size: 0.9em;
-    line-height: 1.3em;
-    margin-bottom: 15px;
-    border-radius: 4px;
-    font-family: monospace;
-  }
-  #expressionVisualizer {
-    background: #0f0f1a;
-    border: 1px solid #00ffe7;
-    border-radius: 4px;
-    width: 100%;
-    max-width: 600px;
-    height: 300px;
-    display: block;
-    margin-bottom: 15px;
-  }
-  #controls {
-    margin-bottom: 15px;
-    width: 100%;
-  }
-  #controls button {
-    width: auto;
-    margin-right: 10px;
-    min-width: 180px;
-  }
-  .achievement {
-    margin: 2px 0;
-  }
-  .achievement.unlocked {
-    color: #0f0;
-  }
-  .glitch {
     color: #00ffe7;
-    text-shadow:
-      1px 0 red,
-      -1px 0 cyan,
-      2px 0 magenta;
-    animation: glitch 1.5s infinite;
+    padding: 10px;
+    overflow-y: auto;
+    border: 1px solid #00ffe7;
+    font-size: 0.9em;
+    text-align: left;
+    white-space: pre-wrap;
   }
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal.show {
+    display: flex;
+  }
+
+  .modal-content {
+    background: #222244;
+    padding: 20px;
+    border: 1px solid #00ffe7;
+    color: #00ffe7;
+    max-width: 600px;
+    text-align: left;
+  }
+
+  .glitch {
+    text-shadow: 1px 0 red, -1px 0 cyan;
+    animation: glitch 1s infinite;
+  }
+
   @keyframes glitch {
-    0% { text-shadow: 1px 0 red, -1px 0 cyan, 2px 0 magenta; }
-    20% { text-shadow: -2px 0 red, 2px 0 cyan, -1px 0 magenta; }
-    40% { text-shadow: 2px 0 red, -2px 0 cyan, 1px 0 magenta; }
-    60% { text-shadow: -1px 0 red, 1px 0 cyan, -2px 0 magenta; }
-    80% { text-shadow: 1px 0 red, -1px 0 cyan, 2px 0 magenta; }
-    100% { text-shadow: -2px 0 red, 2px 0 cyan, -1px 0 magenta; }
+    0% { transform: translate(0); }
+    20% { transform: translate(-1px, 1px); }
+    40% { transform: translate(1px, -1px); }
+    60% { transform: translate(-2px, 0); }
+    80% { transform: translate(2px, 2px); }
+    100% { transform: translate(0); }
+  }
+
+  /* Buttons container */
+  .button-row {
+    margin-top: 20px;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 800px) {
+    #logArea {
+      width: 95%;
+      height: 150px;
+    }
+    button {
+      font-size: 1em;
+      padding: 8px 12px;
+      margin: 6px 4px;
+    }
   }
 </style>
 </head>
 <body>
+  <div id="gameContainer">
+    <div class="main-menu show" id="mainMenu">
+      <h1 class="glitch">Lambda<span style="color:#ff00c8">//</span>Void α v0.1</h1>
+      <button onclick="startGame()">Enter the Void</button>
+    </div>
 
-<div id="sidebar">
-  <h1 class="glitch">Lambda<span style="color:#ff00c8">//</span>Void α v0.1</h1>
-  <div id="tokensDisplay">Tokens: 0</div>
-
-  <div id="upgradesDisplay">
-    <button id="buyReduction">Upgrade Reduction (Cost: 20 tokens)</button>
-    <button id="buyComplexity">Upgrade Complexity (Cost: 25 tokens)</button>
-    <button id="buySynthesizer">Upgrade Synthesizer (Cost: 30 tokens)</button>
+    <div class="game-ui" id="gameUI">
+      <div>
+        <p>Tokens: <span id="tokens"></span></p>
+        <p>Current Expression: <span id="expression"></span></p>
+        <p>Compute Cycles: <span id="computeCycles"></span></p>
+        <p>Reality Points: <span id="realityPoints"></span></p>
+        <p>Qubits: <span id="qubits"></span></p>
+        <p id="upgradeReduction"></p>
+        <p id="upgradeComplexity"></p>
+        <p id="upgradeSynthesizer"></p>
+      </div>
+      <div class="button-row">
+        <button id="generateBtn">Generate Lambda Function (-5 tokens)</button>
+        <button id="reduceBtn">Reduce Expression (+compute cycles)</button>
+        <button id="buyReduction">Upgrade Reduction Speed</button>
+        <button id="buyComplexity">Upgrade Complexity</button>
+        <button id="buySynthesizer">Upgrade Synthesizer</button>
+      </div>
+      <div id="logArea" aria-live="polite" aria-atomic="true"></div>
+    </div>
   </div>
-
-  <div id="controls">
-    <button id="generateBtn">Generate Lambda Expression (Cost: 10 tokens)</button>
-    <button id="generateRecBtn">Generate Recursive Expr (Y Combinator) (Cost: 15 tokens)</button>
-    <button id="reduceBtn">Reduce Expression</button>
-  </div>
-
-  <div id="achievementsPanel">
-    <strong>Achievements:</strong>
-    <div id="achievementsList"></div>
-  </div>
-
-  <div id="logArea"></div>
-</div>
-
-<div id="main">
-  <canvas id="expressionVisualizer" width="600" height="300"></canvas>
-</div>
-
-<audio id="bgMusic" loop autoplay volume="0.15">
-  <source src="https://files.catbox.moe/z1r6ez.mp3" type="audio/mpeg" />
-</audio>
 
 <script>
-  // === Game State ===
   const state = {
     tokens: 50,
-    expression: null,
+    expression: "",
+    exprMaxLength: 10,
     computeCycles: 0,
     upgrades: {
       reduction: 1,
       complexity: 1,
       synthesizer: 1,
     },
-    achievements: {},
+    realityPoints: 0,
+    qubits: 0,
   };
 
-  // === Y Combinator Expression ===
-  const YCombinator = {
-    type: 'abs',
-    param: 'f',
-    body: {
-      type: 'app',
-      func: {
-        type: 'abs',
-        param: 'x',
-        body: {
-          type: 'app',
-          func: { type: 'var', name: 'f' },
-          arg: {
-            type: 'app',
-            func: { type: 'var', name: 'x' },
-            arg: { type: 'var', name: 'x' }
-          }
-        }
-      },
-      arg: {
-        type: 'abs',
-        param: 'x',
-        body: {
-          type: 'app',
-          func: { type: 'var', name: 'f' },
-          arg: {
-            type: 'app',
-            func: { type: 'var', name: 'x' },
-            arg: { type: 'var', name: 'x' }
-          }
-        }
-      }
-    }
+  const saveState = () => localStorage.setItem("lambdaVoidSave", JSON.stringify(state));
+  const loadState = () => {
+    const saved = localStorage.getItem("lambdaVoidSave");
+    if (saved) Object.assign(state, JSON.parse(saved));
   };
 
-  // === Helper: Deep clone an expression ===
-  function deepClone(obj) {
-    return JSON.parse(JSON.stringify(obj));
+  function startGame() {
+    document.getElementById("mainMenu").classList.remove("show");
+    document.getElementById("gameUI").classList.add("show");
+    updateUI();
+    log("Welcome to Lambda//Void! Generating tokens passively...");
   }
 
-  // === Expression to String Conversion ===
-  function exprToString(expr) {
-    if (!expr) return '';
-    switch (expr.type) {
-      case 'var': return expr.name;
-      case 'abs': return `λ${expr.param}.${exprToString(expr.body)}`;
-      case 'app':
-        // If expr equals YCombinator, display 'Y'
-        if (JSON.stringify(expr) === JSON.stringify(YCombinator)) return 'Y';
-        return `(${exprToString(expr.func)} ${exprToString(expr.arg)})`;
-    }
-  }
-
-  // === Generate random variable name ===
-  function randomVarName() {
-    const chars = 'xyzuvw';
-    return chars[Math.floor(Math.random() * chars.length)];
-  }
-
-  // === Generate random lambda expression ===
-  function generateRandomExpr(complexity = 1) {
-    if (complexity >= 5 && Math.random() < 0.1) {
-      // 10% chance to generate Y combinator at complexity >= 5
-      return deepClone(YCombinator);
-    }
-    const choice = Math.random();
-    if (complexity <= 1) {
-      return { type: 'var', name: randomVarName() };
-    }
-    if (choice < 0.4) {
-      return {
-        type: 'abs',
-        param: randomVarName(),
-        body: generateRandomExpr(complexity - 1)
-      };
-    } else {
-      return {
-        type: 'app',
-        func: generateRandomExpr(complexity - 1),
-        arg: generateRandomExpr(complexity - 1)
-      };
-    }
-  }
-
-  // === Substitute variable in expr with replacement ===
-  function substitute(expr, variable, replacement) {
-    switch (expr.type) {
-      case 'var':
-        if (expr.name === variable) return deepClone(replacement);
-        else return expr;
-      case 'abs':
-        if (expr.param === variable) return expr; // variable shadowed
-        else return {
-          type: 'abs',
-          param: expr.param,
-          body: substitute(expr.body, variable, replacement)
-        };
-      case 'app':
-        return {
-          type: 'app',
-          func: substitute(expr.func, variable, replacement),
-          arg: substitute(expr.arg, variable, replacement)
-        };
-    }
-  }
-
-  // === Beta Reduction ===
-  function reduceOnce(expr) {
-    switch (expr.type) {
-      case 'app':
-        if (expr.func.type === 'abs') {
-          // Beta reduction
-          return substitute(expr.func.body, expr.func.param, expr.arg);
-        } else {
-          // Try to reduce func or arg
-          const reducedFunc = reduceOnce(expr.func);
-          if (JSON.stringify(reducedFunc) !== JSON.stringify(expr.func)) {
-            return { type: 'app', func: reducedFunc, arg: expr.arg };
-          }
-          const reducedArg = reduceOnce(expr.arg);
-          if (JSON.stringify(reducedArg) !== JSON.stringify(expr.arg)) {
-            return { type: 'app', func: expr.func, arg: reducedArg };
-          }
-          return expr; // no reduction possible
-        }
-      case 'abs':
-        const reducedBody = reduceOnce(expr.body);
-        if (JSON.stringify(reducedBody) !== JSON.stringify(expr.body)) {
-          return { type: 'abs', param: expr.param, body: reducedBody };
-        }
-        return expr;
-      case 'var':
-        return expr;
-    }
-  }
-
-  // === Check if expression contains YCombinator ===
-  function containsY(expr) {
-    if (!expr) return false;
-    if (JSON.stringify(expr) === JSON.stringify(YCombinator)) return true;
-    switch (expr.type) {
-      case 'var':
-        return false;
-      case 'abs':
-        return containsY(expr.body);
-      case 'app':
-        return containsY(expr.func) || containsY(expr.arg);
-    }
-  }
-
-  // === Expression Visualizer ===
-  const canvas = document.getElementById('expressionVisualizer');
-  const ctx = canvas.getContext('2d');
-  const nodeRadius = 18;
-  const xSpacing = 80;
-  const ySpacing = 60;
-
-  // Calculate tree width recursively
-  function calcWidth(expr) {
-    if (!expr) return 0;
-    switch (expr.type) {
-      case 'var': return 1;
-      case 'abs': return calcWidth(expr.body);
-      case 'app': return calcWidth(expr.func) + calcWidth(expr.arg);
-    }
-  }
-
-  // Draw expression tree with position
-  function drawExpr(expr, x, y, highlightY) {
-    if (!expr) return 0;
-    switch (expr.type) {
-      case 'var':
-        ctx.fillStyle = '#00ffe7';
-        ctx.strokeStyle = '#00ffe7';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(x, y, nodeRadius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = '#000';
-        ctx.font = '18px monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(expr.name, x, y);
-        return 1;
-      case 'abs': {
-        const width = calcWidth(expr.body) * xSpacing;
-        // Draw node
-        ctx.fillStyle = '#ff0090';
-        ctx.strokeStyle = '#ff0090';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.rect(x - nodeRadius, y - nodeRadius, nodeRadius * 2, nodeRadius * 2);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = '#000';
-        ctx.font = '18px monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('λ' + expr.param, x, y);
-        // Draw body below
-        const childX = x;
-        const childY = y + ySpacing;
-        const childWidth = drawExpr(expr.body, childX, childY, highlightY);
-        // Draw line down
-        ctx.strokeStyle = '#00ffe7';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(x, y + nodeRadius);
-        ctx.lineTo(childX, childY - nodeRadius);
-        ctx.stroke();
-        return 1;
-      }
-      case 'app': {
-        const leftWidth = calcWidth(expr.func);
-        const rightWidth = calcWidth(expr.arg);
-        const totalWidth = leftWidth + rightWidth;
-        // Positions for children
-        const leftX = x - (rightWidth * xSpacing) / 2;
-        const rightX = x + (leftWidth * xSpacing) / 2;
-        // Highlight if this subtree is YCombinator
-        const isY = highlightY && JSON.stringify(expr) === JSON.stringify(YCombinator);
-
-        ctx.fillStyle = isY ? '#00ff00' : '#0099ff';
-        ctx.strokeStyle = isY ? '#00ff00' : '#0099ff';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.ellipse(x, y, nodeRadius * 1.5, nodeRadius, 0, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = '#000';
-        ctx.font = '18px monospace';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('@', x, y);
-
-        const childY = y + ySpacing;
-
-        // Draw children
-        drawExpr(expr.func, leftX, childY, highlightY);
-        drawExpr(expr.arg, rightX, childY, highlightY);
-
-        // Draw lines
-        ctx.strokeStyle = '#00ffe7';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(x, y + nodeRadius);
-        ctx.lineTo(leftX, childY - nodeRadius);
-        ctx.moveTo(x, y + nodeRadius);
-        ctx.lineTo(rightX, childY - nodeRadius);
-        ctx.stroke();
-        return totalWidth;
-      }
-    }
-  }
-
-  // === UI Elements ===
-  const tokensDisplay = document.getElementById('tokensDisplay');
-  const logArea = document.getElementById('logArea');
-  const generateBtn = document.getElementById('generateBtn');
-  const generateRecBtn = document.getElementById('generateRecBtn');
-  const reduceBtn = document.getElementById('reduceBtn');
-  const buyReductionBtn = document.getElementById('buyReduction');
-  const buyComplexityBtn = document.getElementById('buyComplexity');
-  const buySynthesizerBtn = document.getElementById('buySynthesizer');
-  const achievementsList = document.getElementById('achievementsList');
-
-  // === Log helper ===
-  function log(text) {
-    const now = new Date().toLocaleTimeString();
-    logArea.innerText = `[${now}] ${text}\n` + logArea.innerText;
-  }
-
-  // === Update UI ===
   function updateUI() {
-    tokensDisplay.textContent = `Tokens: ${state.tokens}`;
-    buyReductionBtn.disabled = state.tokens < 20;
-    buyComplexityBtn.disabled = state.tokens < 25;
-    buySynthesizerBtn.disabled = state.tokens < 30;
-    generateBtn.disabled = state.tokens < 10;
-    generateRecBtn.disabled = state.tokens < 15;
-
-    // Achievements display
-    achievementsList.innerHTML = '';
-    Object.entries(state.achievements).forEach(([id, ach]) => {
-      const div = document.createElement('div');
-      div.className = 'achievement' + (ach.unlocked ? ' unlocked' : '');
-      div.textContent = `${ach.unlocked ? '✓' : '✗'} ${ach.name}`;
-      achievementsList.appendChild(div);
-    });
+    document.getElementById("tokens").textContent = state.tokens.toFixed(2);
+    document.getElementById("expression").textContent = state.expression || "(empty)";
+    document.getElementById("computeCycles").textContent = state.computeCycles;
+    document.getElementById("realityPoints").textContent = state.realityPoints;
+    document.getElementById("qubits").textContent = state.qubits;
+    updateUpgradeTexts();
   }
 
-  // === Achievements ===
-  const ACHIEVEMENTS = {
-    firstExpr: { name: 'Generate your first expression', unlocked: false },
-    firstRecExpr: { name: 'Generate recursive Y combinator', unlocked: false },
-    firstReduction: { name: 'Perform your first reduction', unlocked: false },
-    tokenCollector: { name: 'Collect 100 tokens', unlocked: false },
-  };
+  function updateUpgradeTexts() {
+    document.getElementById("upgradeReduction").textContent = `Reduction Speed Level: ${state.upgrades.reduction} (cost: ${20 * state.upgrades.reduction} compute cycles)`;
+    document.getElementById("upgradeComplexity").textContent = `Complexity Level: ${state.upgrades.complexity} (cost: ${25 * state.upgrades.complexity} compute cycles)`;
+    document.getElementById("upgradeSynthesizer").textContent = `Synthesizer Level: ${state.upgrades.synthesizer} (cost: ${30 * state.upgrades.synthesizer} compute cycles)`;
+  }
 
-  function unlockAchievement(id) {
-    if (!state.achievements[id]) {
-      state.achievements[id] = { ...ACHIEVEMENTS[id], unlocked: true };
-      log(`Achievement unlocked: ${ACHIEVEMENTS[id].name}`);
-      updateUI();
+  // Log queue for better updates window experience
+  const maxLogLines = 10;
+  let logLines = [];
+
+  function log(message) {
+    const logArea = document.getElementById("logArea");
+    logLines.unshift(message);
+    if (logLines.length > maxLogLines) logLines.pop();
+    logArea.textContent = logLines.join("\n");
+  }
+
+  function generateLambda() {
+    if (state.tokens < 5) {
+      log("Not enough tokens to generate lambda function.");
+      return;
     }
+    if (state.expression.length >= state.exprMaxLength) {
+      log("Expression is too complex to add more.");
+      return;
+    }
+    state.tokens -= 5;
+
+    const parts = ['λx.', 'λy.', 'x', 'y', '(', ')', ' '];
+    const part = parts[Math.floor(Math.random() * parts.length)];
+    state.expression += part;
+    log(`Generated part "${part.trim() || ' '}" added.`);
+    updateUI();
   }
 
-  // === Save/Load ===
-  function saveGame() {
-    const saveData = {
-      tokens: state.tokens,
-      expression: state.expression,
-      upgrades: state.upgrades,
-      achievements: state.achievements,
+  function reduceExpression() {
+    if (!state.expression || state.expression.length === 0) {
+      log("No expression to reduce.");
+      return;
+    }
+
+    const reductionAmount = state.upgrades.reduction;
+    state.expression = state.expression.slice(0, Math.max(0, state.expression.length - reductionAmount));
+    const gainedCycles = reductionAmount * (1 + state.upgrades.complexity * 0.5);
+    state.computeCycles += gainedCycles;
+    log(`Reduced expression by ${reductionAmount} step${reductionAmount > 1 ? 's' : ''}, gained ${gainedCycles.toFixed(1)} compute cycles.`);
+    updateUI();
+  }
+
+  function buyUpgrade(type) {
+    const costs = {
+      reduction: 20 * state.upgrades.reduction,
+      complexity: 25 * state.upgrades.complexity,
+      synthesizer: 30 * state.upgrades.synthesizer,
     };
-    localStorage.setItem('lambdaVoidSave', JSON.stringify(saveData));
-    log('Game saved.');
-  }
-
-  function loadGame() {
-    const data = localStorage.getItem('lambdaVoidSave');
-    if (data) {
-      try {
-        const obj = JSON.parse(data);
-        state.tokens = obj.tokens || 0;
-        state.expression = obj.expression || null;
-        state.upgrades = obj.upgrades || { reduction:1, complexity:1, synthesizer:1 };
-        state.achievements = obj.achievements || {};
-        log('Game loaded.');
-        updateUI();
-        draw();
-      } catch (e) {
-        log('Failed to load save data.');
-      }
-    } else {
-      log('No save data found.');
-    }
-  }
-
-  // === Game Actions ===
-
-  // Generate random expression action
-  generateBtn.onclick = () => {
-    if (state.tokens < 10) {
-      log('Not enough tokens to generate expression.');
+    if (state.computeCycles < costs[type]) {
+      log(`Not enough Compute Cycles to upgrade ${type}. Need ${costs[type]}.`);
       return;
     }
-    state.tokens -= 10;
-    const complexity = 1 + state.upgrades.complexity;
-    state.expression = generateRandomExpr(complexity);
-    log(`Generated expression: ${exprToString(state.expression)}`);
-    unlockAchievement('firstExpr');
+    state.computeCycles -= costs[type];
+    state.upgrades[type]++;
+    log(`${type.charAt(0).toUpperCase() + type.slice(1)} upgraded to level ${state.upgrades[type]}.`);
     updateUI();
-    draw();
-    saveGame();
-  };
-
-  // Generate recursive (Y combinator) expression
-  generateRecBtn.onclick = () => {
-    if (state.tokens < 15) {
-      log('Not enough tokens to generate recursive expression.');
-      return;
-    }
-    state.tokens -= 15;
-    state.expression = deepClone(YCombinator);
-    log('Generated recursive Y combinator expression.');
-    unlockAchievement('firstRecExpr');
-    updateUI();
-    draw();
-    saveGame();
-  };
-
-  // Reduce expression once
-  reduceBtn.onclick = () => {
-    if (!state.expression) {
-      log('No expression to reduce.');
-      return;
-    }
-    const beforeStr = JSON.stringify(state.expression);
-    let reduced = state.expression;
-    for (let i = 0; i < state.upgrades.reduction; i++) {
-      reduced = reduceOnce(reduced);
-    }
-    if (JSON.stringify(reduced) === beforeStr) {
-      log('Expression is in normal form; no further reduction possible.');
-    } else {
-      state.expression = reduced;
-      state.tokens += 5 * state.upgrades.synthesizer;
-      log(`Reduced expression to: ${exprToString(state.expression)} (+${5 * state.upgrades.synthesizer} tokens)`);
-      unlockAchievement('firstReduction');
-      if (state.tokens >= 100) unlockAchievement('tokenCollector');
-      updateUI();
-      draw();
-      saveGame();
-    }
-  };
-
-  // Buy upgrades
-  buyReductionBtn.onclick = () => {
-    if (state.tokens < 20) return;
-    state.tokens -= 20;
-    state.upgrades.reduction++;
-    log(`Reduction upgrade purchased! Level: ${state.upgrades.reduction}`);
-    updateUI();
-    saveGame();
-  };
-  buyComplexityBtn.onclick = () => {
-    if (state.tokens < 25) return;
-    state.tokens -= 25;
-    state.upgrades.complexity++;
-    log(`Complexity upgrade purchased! Level: ${state.upgrades.complexity}`);
-    updateUI();
-    saveGame();
-  };
-  buySynthesizerBtn.onclick = () => {
-    if (state.tokens < 30) return;
-    state.tokens -= 30;
-    state.upgrades.synthesizer++;
-    log(`Synthesizer upgrade purchased! Level: ${state.upgrades.synthesizer}`);
-    updateUI();
-    saveGame();
-  };
-
-  // === Draw function ===
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (state.expression) {
-      const highlightY = containsY(state.expression);
-      drawExpr(state.expression, canvas.width / 2, 40, highlightY);
-    } else {
-      ctx.fillStyle = '#444';
-      ctx.font = '20px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('No expression loaded', canvas.width / 2, canvas.height / 2);
-    }
   }
 
-  // === Initialization ===
-  function init() {
-    // Initialize achievements list empty
-    Object.keys(ACHIEVEMENTS).forEach(k => {
-      state.achievements[k] = { ...ACHIEVEMENTS[k], unlocked: false };
-    });
-    loadGame();
+  // Passive token growth every 2 seconds, scaled by synthesizer upgrade
+  setInterval(() => {
+    const gain = 1 * state.upgrades.synthesizer;
+    state.tokens += gain;
+    log(`Passive tokens increased by ${gain}.`);
     updateUI();
-    draw();
-  }
+    saveState();
+  }, 2000);
 
-  init();
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById("generateBtn").addEventListener("click", generateLambda);
+    document.getElementById("reduceBtn").addEventListener("click", reduceExpression);
+    document.getElementById("buyReduction").addEventListener("click", () => buyUpgrade('reduction'));
+    document.getElementById("buyComplexity").addEventListener("click", () => buyUpgrade('complexity'));
+    document.getElementById("buySynthesizer").addEventListener("click", () => buyUpgrade('synthesizer'));
 
-  // Auto-save every 30 seconds
-  setInterval(saveGame, 30000);
+    loadState();
+    updateUI();
 
+    // Auto save every 10 seconds
+    setInterval(saveState, 10000);
+  });
 </script>
-
 </body>
 </html>
